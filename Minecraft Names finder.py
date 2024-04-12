@@ -1,23 +1,39 @@
 # Ceci est un script pour fait par BlobIsBack (github)
+# Ce script peut contenir des erreurs, si c'est le cas faite une issue et/ou un pull request
 
 import requests
 import time
-print("recherche de pseudo disponible parmis 100 mots aleatoire (doublons possible lors du choix des mots)")
+error = 0
 var = 0
+doublons = 0
 list = []
-for i in range(25):
-	url = requests.get('https://random-word-api.herokuapp.com/word?lang=en')
-	response = str(url.json()).replace('"', '').replace("'", "").replace('[',"").replace(']',"").replace('-',"").replace('-',"").replace('.',"")
-	apimojang = requests.get(f'https://api.mojang.com/users/profiles/minecraft/{response}')
-	if apimojang.status_code == 404:
-		print(response + " est un pseudo disponible")
-		list.append(response)
-		var = var + 1
-	elif apimojang.status_code == 429:
-		print("trop de requetes, 10 secondes de pause")
-		time.sleep(10)
+used = []
+for i in range(450):
+	url = requests.get('https://random-word-form.herokuapp.com/random/noun/')
+	
+	response = str(url.json()).replace('"', '').replace("'", "").replace('[',"").replace(']',"").replace('-',"").replace('-',"").replace('.',"").replace(' ', "")
+	if response not in used and int(len(response)) >= 3 and int(len(response)) <= 16:
+		used.append(response)
+		apimojang = requests.get(f'https://api.mojang.com/users/profiles/minecraft/{response}')
+		if apimojang.status_code == 404:
+				print(response + " est un pseudo disponible")
+				list.append(response)
+				var = var + 1
+		elif apimojang.status_code == 429:
+			print("trop de requetes, 10 secondes de pause")
+			apimojang = requests.get(f'https://api.mojang.com/users/profiles/minecraft/{response}')
+			if apimojang.status_code == 404:
+					print(response + " est un pseudo disponible")
+					list.append(response)
+					var = var + 1
+			else:
+					print("le pseudo " + response + " n'est pas disponible ou une erreur est survenue. (code 200 = pseudo indisponible)" + " code " + str(apimojang.status_code))
+		else:
+			print(response + " est un pseudo indisponible")
 	else:
-		print(response + " est un pseudo indisponible")
+		print(f"le pseudo {response} a deja ete testé ou est invalide")
+		doublons = doublons + 1
+		print(doublons)
 	time.sleep(0.5)
 print('')
 print("recherche finie, " + str(var) + " pseudos on été trouvés")
