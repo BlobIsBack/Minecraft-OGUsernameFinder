@@ -8,7 +8,8 @@ var = 0
 doublons = 0
 list = []
 used = []
-for i in range(450):
+for i in range(1500):
+	sleep_time = 0.5
 	url = requests.get('https://random-word-form.herokuapp.com/random/noun/')
 	
 	response = str(url.json()).replace('"', '').replace("'", "").replace('[',"").replace(']',"").replace('-',"").replace('-',"").replace('.',"").replace(' ', "")
@@ -20,7 +21,8 @@ for i in range(450):
 				list.append(response)
 				var = var + 1
 		elif apimojang.status_code == 429:
-			print("trop de requetes, 10 secondes de pause")
+			print("trop de requetes, 5 secondes de pause")
+			time.sleep(5)
 			apimojang = requests.get(f'https://api.mojang.com/users/profiles/minecraft/{response}')
 			if apimojang.status_code == 404:
 					print(response + " est un pseudo disponible")
@@ -34,7 +36,8 @@ for i in range(450):
 		print(f"le pseudo {response} a deja ete testé ou est invalide")
 		doublons = doublons + 1
 		print(doublons)
-	time.sleep(0.5)
+		sleep_time = 0
+	time.sleep(sleep_time)
 print('')
 print("recherche finie, " + str(var) + " pseudos on été trouvés")
 print("")
